@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>С 8 марта, пацаны (и Настя) !</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            transition: background 0.3s ease;
+        }
+
+        /* ФОНОВЫЕ СТИЛИ ДЛЯ КАЖДОГО ПЕРСОНАЖА (вешаются на body) */
+        body.igor-bg {
+            background: linear-gradient(145deg, #ffb6c1, #ffc0cb, #ffe4e1);
+            background-size: 200% 200%;
+            animation: bgMove 10s ease infinite;
+        }
+        body.danya-bg {
+            background: #1a1a1a;
+            background-image: repeating-linear-gradient(45deg, #330000 0px, #330000 20px, #1a1a1a 20px, #1a1a1a 40px);
+            animation: none;
+            position: relative;
+        }
+        body.danya-bg::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(180, 0, 0, 0.15), transparent 50%);
+            pointer-events: none;
+        }
+        body.vanya-bg {
+            background: linear-gradient(135deg, #f9e79f, #fadadd, #f9e79f);
+            background-size: 300% 300%;
+            animation: bgMove 12s ease infinite;
+        }
+        body.nastya-bg {
+            background: repeating-linear-gradient(45deg, #b0e0ff, #b0e0ff 20px, #ffffff 20px, #ffffff 40px);
+            animation: none;
+        }
+
+        @keyframes bgMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* КНОПКИ НАВИГАЦИИ */
+        .nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 700px;
+            z-index: 5;
+        }
+
+        .nav-btn {
+            flex: 1 0 auto;
+            padding: 14px 18px;
+            border: none;
+            border-radius: 60px;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.7);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1a1a2e;
+            text-shadow: 0 2px 5px white;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: 0.2s;
+            min-width: 120px;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255,255,255,0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+
+        /* КОНТЕЙНЕР СТРАНИЦЫ (СТЕКЛЯННЫЙ) */
+        .page-container {
+            width: 100%;
+            max-width: 700px;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 56px;
+            padding: 30px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2), inset 0 0 30px rgba(255,255,255,0.5);
+            border: 2px solid rgba(255,255,255,0.4);
+        }
+
+        /* СТРАНИЦЫ */
+        .page {
+            display: none;
+        }
+        .page.active {
+            display: block;
+        }
+
+        /* АВАТАР И ОБЛАЧКО ПОДСКАЗКИ */
+        .avatar-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px 0 25px;
+        }
+
+        .avatar {
+            width: 190px;
+            height: 190px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            background-size: cover;
+            background-position: center;
+            border: 5px solid rgba(255,255,255,0.8);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.25);
+            cursor: pointer;
+            transition: transform 0.15s, filter 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: #aaa;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .avatar:active {
+            transform: scale(0.97);
+        }
+
+        /* КРАСНЫЙ КРЕСТ ПОВЕРХ АВАТАРКИ ДАНИ */
+        .cross-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 0, 0, 0.5);
+            backdrop-filter: blur(1px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            color: white;
+            text-shadow: 2px 2px 5px black;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .cross-overlay.show {
+            opacity: 0.9;
+        }
+
+        .cross-overlay i {
+            filter: drop-shadow(0 0 5px darkred);
+        }
+
+        /* ДЛЯ ПОСТОЯННОГО КРЕСТА ПРИ 0 HP */
+        .cross-overlay.permanent {
+            opacity: 0.9;
+            background-color: rgba(180, 0, 0, 0.7);
+        }
+
+        /* ОБЛАЧКО ПОДСКАЗКИ */
+        .action-hint {
+            position: absolute;
+            top: -10px;
+            right: 5px;
+            background: rgba(20, 20, 30, 0.8);
+            backdrop-filter: blur(6px);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 500;
+            border: 1px solid rgba(255,255,255,0.3);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .action-hint i {
+            margin-right: 8px;
+            color: #ffd966;
+        }
+
+        @media (max-width: 480px) {
+            .avatar { width: 150px; height: 150px; }
+            .action-hint { font-size: 0.85rem; padding: 5px 15px; right: 0; }
+        }
+
+        /* ТЕКСТ ПОЗДРАВЛЕНИЯ */
+        .greeting {
+            text-align: center;
+            font-size: 1.9rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin: 15px 0 20px;
+            color: #1e2b3a;
+            text-shadow: 3px 3px 12px rgba(255,255,255,0.7);
+            word-break: break-word;
+        }
+
+        .greeting i {
+            color: #ff4d6d;
+            margin: 0 5px;
+        }
+
+        /* ДЕКОР ИКОНКИ */
+        .decor {
+            display: flex;
+            justify-content: center;
+            gap: 22px;
+            flex-wrap: wrap;
+            font-size: 2.5rem;
+            margin: 20px 0 10px;
+            color: #3a3a5a;
+            opacity: 0.75;
+        }
+
+        /* ПОЛОСКА ЗДОРОВЬЯ ДЛЯ ДАНИ */
+        .hp-bar {
+            width: 85%;
+            height: 30px;
+            background: #1f1f2e;
+            border-radius: 40px;
+            margin: 20px auto 15px;
+            overflow: hidden;
+            border: 2px solid #d90429;
+            box-shadow: 0 0 15px #d90429;
+        }
+
+        .hp-fill {
+            height: 100%;
+            width: 100%;
+            background: #e63946;
+            transition: width 0.2s;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .reset-btn {
+            background: #d90429;
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            padding: 10px 30px;
+            border-radius: 50px;
+            box-shadow: 0 6px 0 #9b0120;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1px solid #ffa7a7;
+            margin-top: 10px;
+        }
+
+        .reset-btn:active {
+            transform: translateY(5px);
+            box-shadow: 0 1px 0 #9b0120;
+        }
+
+        /* АНИМАЦИИ УДАРА */
+        .hit-effect {
+            animation: shake 0.3s ease, redflash 0.2s alternate 2;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-12px); }
+            40% { transform: translateX(12px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(6px); }
+        }
+
+        @keyframes redflash {
+            from { filter: brightness(1); box-shadow: 0 0 5px #ff0000; }
+            to { filter: brightness(1.4); box-shadow: 0 0 35px #ff0000; }
+        }
+
+        /* АНИМАЦИЯ ПОГЛАЖИВАНИЯ */
+        .hand-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            pointer-events: none;
+            opacity: 0;
+            animation: stroke 0.9s ease-out forwards;
+            color: #ffb6c1;
+            text-shadow: 3px 3px 15px white, 0 0 20px hotpink;
+            z-index: 20;
+        }
+
+        @keyframes stroke {
+            0% { opacity: 0; transform: scale(0.2) translateX(-50px) rotate(-15deg); }
+            20% { opacity: 1; transform: scale(1) translateX(0) rotate(0); }
+            80% { opacity: 1; transform: scale(1) translateX(0) rotate(0); }
+            100% { opacity: 0; transform: scale(1.3) translateX(60px) rotate(10deg); }
+        }
+    </style>
+</head>
+<body class="igor-bg">
+    <!-- НАВИГАЦИЯ -->
+    <div class="nav">
+        <button class="nav-btn" id="btn-igor" onclick="showPage('igor')">❤️ Игорь</button>
+        <button class="nav-btn" id="btn-danya" onclick="showPage('danya')">⚡ Даня</button>
+        <button class="nav-btn" id="btn-vanya" onclick="showPage('vanya')">🌸 Ваня</button>
+        <button class="nav-btn" id="btn-nastya" onclick="showPage('nastya')">🎖️ Настя</button>
+    </div>
+
+    <!-- КОНТЕЙНЕР -->
+    <div class="page-container">
+        <!-- ИГОРЬ -->
+        <div id="igor" class="page active">
+            <div class="avatar-wrapper">
+                <div class="avatar" id="igor-avatar" style="background-image: url('igor.jpg');">
+                    <span style="display: none;">И</span>
+                </div>
+                <div class="action-hint"><i class="fas fa-hand-sparkles"></i> погладить</div>
+            </div>
+            <div class="greeting">
+                Игорь, с 8 марта! 🌷<br>Просто оставайся лапочкой
+            </div>
+            <div class="decor">
+                <i class="fas fa-heart"></i>
+                <i class="fas fa-cat"></i>
+                <i class="fas fa-cloud-sun"></i>
+                <i class="fas fa-hand-peace"></i>
+            </div>
+        </div>
+
+        <!-- ДАНЯ -->
+        <div id="danya" class="page">
+            <div class="avatar-wrapper">
+                <div class="avatar" id="danya-avatar" style="background-image: url('danya.jpg');">
+                    <span style="display: none;">Д</span>
+                    <!-- Элемент красного креста (появляется при ударе) -->
+                    <div class="cross-overlay" id="danya-cross"><i class="fas fa-times"></i></div>
+                </div>
+                <div class="action-hint"><i class="fas fa-fist-raised"></i> ударить (-10 HP)</div>
+            </div>
+            <div class="greeting">
+                Даня, с 8 марта! 💥<br>Бьёт — значит любит
+            </div>
+            <div class="decor">
+                <i class="fas fa-bolt"></i>
+                <i class="fas fa-shield-halved"></i>
+                <i class="fas fa-skull"></i>
+            </div>
+            <!-- Полоска здоровья -->
+            <div class="hp-bar">
+                <div class="hp-fill" id="hp-fill" style="width: 100%;">100 HP</div>
+            </div>
+            <div style="text-align: center;">
+                <button class="reset-btn" id="reset-danya">💉 Реанимировать</button>
+            </div>
+        </div>
+
+        <!-- ВАНЯ -->
+        <div id="vanya" class="page">
+            <div class="avatar-wrapper">
+                <div class="avatar" style="background-image: url('vanya.jpg');">
+                    <span style="display: none;">В</span>
+                </div>
+                <div class="action-hint"><i class="fas fa-star"></i> просто полюбуйся</div>
+            </div>
+            <div class="greeting">
+                Ваня, с 8 марта! 🌼<br>Пусть девушки дарят тебе цветы и подарки
+            </div>
+            <div class="decor">
+                <i class="fas fa-gift"></i>
+                <i class="fas fa-tree"></i>
+                <i class="fas fa-crown"></i>
+            </div>
+        </div>
+
+        <!-- НАСТЯ -->
+        <div id="nastya" class="page">
+            <div class="avatar-wrapper">
+                <div class="avatar" style="background-image: url('nastya.jpg');">
+                    <span style="display: none;">Н</span>
+                </div>
+                <div class="action-hint"><i class="fas fa-medal"></i> с прошедшим 23</div>
+            </div>
+            <div class="greeting">
+                Настя, с прошедшим 23 февраля! 🪖<br>Ты наш главный защитник, но цветы тебе тоже к лицу
+            </div>
+            <div class="decor">
+                <i class="fas fa-tank"></i>
+                <i class="fas fa-helicopter"></i>
+                <i class="fas fa-feather"></i>
+                <i class="fas fa-rose"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- МАЛЕНЬКАЯ ПОДСКАЗКА ПРО ФОТО (можно убрать) -->
+    <div style="margin-top: 18px; font-size: 0.9rem; color: #2e2e4a; background: rgba(255,255,255,0.4); padding: 8px 22px; border-radius: 40px; backdrop-filter: blur(5px);">
+        📸 фото: igor.jpg, danya.jpg, vanya.jpg, nastya.jpg (в корне)
+    </div>
+
+    <script>
+        // Переключение страниц + смена фона body
+        function showPage(person) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(person).classList.add('active');
+
+            // Меняем класс у body для уникального фона
+            document.body.className = person + '-bg';
+        }
+
+        // ----------------- ДАНЯ -----------------
+        let danyaHP = 100;
+        const maxHP = 100;
+        const hpFill = document.getElementById('hp-fill');
+        const danyaAvatar = document.getElementById('danya-avatar');
+        const resetBtn = document.getElementById('reset-danya');
+        const crossOverlay = document.getElementById('danya-cross');
+
+        function updateHP() {
+            hpFill.style.width = danyaHP + '%';
+            hpFill.textContent = danyaHP + ' HP';
+            if (danyaHP <= 0) {
+                hpFill.textContent = '💀 0 HP';
+                hpFill.style.background = '#2b2d42';
+                // Показываем постоянный крест
+                crossOverlay.classList.add('permanent');
+            } else {
+                hpFill.style.background = '#e63946';
+                crossOverlay.classList.remove('permanent');
+                crossOverlay.classList.remove('show'); // убираем, если был
+            }
+        }
+
+        // Звук удара
+        function playHitSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(40, audioCtx.currentTime + 0.2);
+                gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } catch (e) {}
+        }
+
+        if (danyaAvatar) {
+            danyaAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+                if (danyaHP <= 0) {
+                    alert('Даня в нокауте! Жми "Реанимировать".');
+                    return;
+                }
+
+                danyaHP = Math.max(0, danyaHP - 10);
+                updateHP();
+
+                // Анимация удара
+                danyaAvatar.classList.add('hit-effect');
+                setTimeout(() => danyaAvatar.classList.remove('hit-effect'), 300);
+
+                // Показываем красный крест на 0.4 сек (если не умер)
+                if (danyaHP > 0) {
+                    crossOverlay.classList.add('show');
+                    setTimeout(() => {
+                        if (danyaHP > 0) { // не убираем, если уже умер (там постоянный)
+                            crossOverlay.classList.remove('show');
+                        }
+                    }, 400);
+                }
+
+                playHitSound();
+            });
+        }
+
+        if (resetBtn) {
+            resetBtn.addEventListener('click', function() {
+                danyaHP = maxHP;
+                updateHP();
+                danyaAvatar.classList.remove('hit-effect');
+                crossOverlay.classList.remove('permanent');
+                crossOverlay.classList.remove('show');
+            });
+        }
+
+        // ----------------- ИГОРЬ -----------------
+        const igorAvatar = document.getElementById('igor-avatar');
+
+        function playGentleSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(500, audioCtx.currentTime + 0.15);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.25);
+            } catch (e) {}
+        }
+
+        if (igorAvatar) {
+            igorAvatar.addEventListener('click', function(e) {
+                e.stopPropagation();
+
+                const oldHand = this.parentNode.querySelector('.hand-animation');
+                if (oldHand) oldHand.remove();
+
+                const hand = document.createElement('div');
+                hand.classList.add('hand-animation');
+                hand.innerHTML = '<i class="fas fa-hand-sparkles"></i>';
+                this.parentNode.appendChild(hand);
+
+                setTimeout(() => hand.remove(), 900);
+
+                playGentleSound();
+            });
+        }
+
+        // Показываем Игоря по умолчанию
+        showPage('igor');
+    </script>
+</body>
+</html>
